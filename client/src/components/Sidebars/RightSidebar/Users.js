@@ -1,4 +1,4 @@
-import React, {useState, useEffect, useContext} from 'react';
+import React, {useState, useEffect, useRef, useContext} from 'react';
 import {Context} from '../../../store/Store';
 import {actions} from '../../../reducers/actions';
 import { makeStyles } from '@material-ui/core/styles';
@@ -13,7 +13,7 @@ import ListItemText from '@material-ui/core/ListItemText';
 import Avatar from '@material-ui/core/Avatar';
 import SpringScrollbars from '../../../utils/ScrollBar';
 import socket from '../../../utils/socket';
-import {removeToken} from '../../../utils/helpers';
+import {checkToken, removeToken} from '../../../utils/helpers';
 import UserInfo from './Dialogs/UserInfo';
 import BannedModal from './Dialogs/BannedUser';
 import Preloader from '../../Helpers/Preloader';
@@ -53,18 +53,15 @@ const Chat = () => {
     });
     const [open, setOpen] = useState(false);
     const [bannedDialog, showBannedDialog] = useState(false);
-
-    useEffect(() => {
-        // window.addEventListener("beforeunload", function (e) {
-        //     const token = checkToken();
-        //     socket.emit('userExited', {
-        //         room:state.currentRoom._id,
-        //         token,
-        //         fullName:state.currentUser.fullName
-        //     });
-
-        // });
-    });
+    
+    window.onbeforeunload = () => {
+        const token = checkToken();
+        socket.emit('userExited', {
+            room: state.currentRoom._id,
+            token,
+            fullName: state.currentUser.fullName
+        });
+    }
     
     useEffect(() => {
         if(currentUserID === userID && !bannedDialog){
@@ -89,6 +86,16 @@ const Chat = () => {
         // serCurrentUserID(state.currentUser._id);
     }, [state.currentUser]);
 
+    const handlerUnload = (e) => {
+        const token = checkToken();
+        socket.emit('userExited', {
+            room: state.currentRoom._id,
+            token,
+            fullName: state.currentUser.fullName
+        });
+        // setTrigger(false);
+    }
+
 
     const banUser = () => {
         showBannedDialog(true);
@@ -98,6 +105,7 @@ const Chat = () => {
     }
 
     const socketOnListeners = () => {
+
         
         socket.on("newUserArrived", data => {
             if(data.roomUsers){

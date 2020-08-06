@@ -13,7 +13,7 @@ export default function CreateUpdate(props) {
   const {open, headline, action, saveHeadline, currentRoom} = props;
   const [roomName, setRoomName] = useState(currentRoom.name ?? '');
   const [roomTopic, setRoomTopic] = useState(currentRoom.topic ?? '');
-  const [roomPassword, setRoomPassword] = useState(currentRoom.password ?? '');
+  const [roomPassword, setRoomPassword] = useState('');
 
   const handleClose = () => {
     props.closeDialog();

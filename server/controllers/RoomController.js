@@ -154,7 +154,7 @@ const joinRoom = async (token, _id) => {
 }
 
 const exitRoom = async (token, room) => {
-    const loggedRoom = await Room.findById({_id:room})
+    const loggedRoom = await Room.findById({_id:room});
     if(!loggedRoom) return false;
     const decodeToken = await jwt.decode(token);
     if(!decodeToken) return false;
@@ -163,18 +163,22 @@ const exitRoom = async (token, room) => {
     if(!roomUsers || roomUsers.length === 0) return userID;
 
 
-    const arrayIndex = roomUsers.findIndex(x => x.id === userID);
-    if(arrayIndex > -1){
-        roomUsers.splice(arrayIndex, 1);
-        loggedRoom.users = roomUsers;
-        const roomDataUpdated = await loggedRoom.save();
-        return {
-            exitedUser: userID,
-            currentRoomUsers: roomDataUpdated.users
-        };
+    try {
+        const arrayIndex = roomUsers.findIndex(x => x.id === userID);
+        if (arrayIndex > -1) {
+            roomUsers.splice(arrayIndex, 1);
+            loggedRoom.users = roomUsers;
+            const roomDataUpdated = await loggedRoom.save();
+            return {
+                exitedUser: userID,
+                currentRoomUsers: roomDataUpdated.users
+            };
+        }
+    } catch (error) {
+        return {exitedUser: userID, currentRoomUsers: []};
     }
 
-    return {exitedUser: userID}
+    
     
 
     

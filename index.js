@@ -37,6 +37,8 @@ app.post('/signup', signUpMiddleware, UserController.signUp);
 app.post('/login', loginMiddleWare, UserController.logIn);
 
 
+let action_count = 0;
+
 io.on('connection', (socket) => {
 
   const messageData = new Date();
@@ -287,32 +289,34 @@ io.on('connection', (socket) => {
 
   }
 
+  
+
   socket.on('userExited', async (data) => {
-    const {token, room, fullName} = data;
-    const userExited = await RoomController.exitRoom(token, room);
+    try {
+      const {token, room, fullName} = data;
+      const userExited = await RoomController.exitRoom(token, room);
 
-    if(!userExited) return false;
+      if(!userExited) return false;
 
-    const roomUsers = await UserController.getRoomUsersData(room);
-    if (!roomUsers) return false;
+      const roomUsers = await UserController.getRoomUsersData(room);
+      if (!roomUsers) return false;
 
-    socket.to(room).emit('userLeft', {
-      currentRoomUsers: roomUsers,
-      message: {
-        type: 'system',
-        sender: 'System',
-        message: fullName + ' has left the chat!',
-        attachment: null,
-        date: messageData.getHours() + ":" + messageData.getMinutes(),
-      }
-    });
+      socket.to(room).emit('userLeft', {
+        currentRoomUsers: roomUsers,
+        message: {
+          type: 'system',
+          sender: 'System',
+          message: fullName + ' has left the chat!',
+          attachment: null,
+          date: messageData.getHours() + ":" + messageData.getMinutes(),
+        }
+      });
+    } catch (error) {
+      // console.log(error);
+    }
+    
 
   })
-
-  // socket.on('browserClosing', async (data) => {
-  //   const {room, token} = data;
-  //   RoomController.exitRoom(token, room);
-  // });
 
   socket.on('updateUserData', async (data) => {
     const {token, fullName, email, avatar} = data;
