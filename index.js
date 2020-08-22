@@ -142,19 +142,39 @@ io.on('connection', (socket) => {
       }
     }
     else{
+
+      const currentRoomUsers = await RoomController.getRoomUsers(room._id);
+      if (!currentRoomUsers) return false;
+
       const roomRemoved = await RoomController.removeRoom(room._id);
       if(!roomRemoved){
         socket.emit('roomRemoveError');
       }
       else{
-        io.of('/').in(room._id).clients((error, socketIds) => {
+
+        // console.log('we should be joined to guest room', currentRoomUsers);
+
+        const usersJoinedToDefaultRoom = await RoomController.multipleJoin(defaultRoom._id, currentRoomUsers);
+        if (!usersJoinedToDefaultRoom) return false;
+
+        const guestRoomUsers = await UserController.getRoomUsersData(defaultRoom._id);
+        
+        if (!guestRoomUsers) return false;
+
+        // console.log('we are new guest room users', usersJoinedToDefaultRoom);
+        // console.log('we are current guest room users', guestRoomUsers);
+
+        io.of('/').in(room._id).clients(async (error, socketIds) => {
           if (error) throw error;
+
+
 
           socketIds.forEach(socketId => {
             io.sockets.sockets[socketId].leave(room._id);
             io.sockets.sockets[socketId].join(defaultRoom._id);
             io.sockets.sockets[socketId].emit('room-changed', {
               room: defaultRoom,
+              roomUsers: guestRoomUsers,
               message: {
                 type: 'system',
                 sender: 'System',
@@ -167,7 +187,19 @@ io.on('connection', (socket) => {
 
         });
 
-        io.emit('roomDeleted', room);
+        socket.to(defaultRoom._id).emit('room-changed', {
+          room: defaultRoom,
+          roomUsers: guestRoomUsers,
+          message: {
+            type: 'system',
+            sender: 'System',
+            message: 'New users has arrived!',
+            attachment: null,
+            date: messageData.getHours() + ":" + messageData.getMinutes(),
+          }
+        });
+
+        io.emit('roomDeleted', {room});
       }
     }
   });
@@ -258,6 +290,8 @@ io.on('connection', (socket) => {
     
     const newRoomUsers = await UserController.getRoomUsersData(newRoom._id);
     if (!newRoomUsers) return false;
+
+    // console.log(newRoomUsers);
 
 
     socket.join(newRoom._id);

@@ -75,8 +75,8 @@ const logIn = async (req, res) => {
   
 };
 
-const getRoomUsersData = async (userID) => {
-  const usersList = await RoomController.getRoomUsers(userID);
+const getRoomUsersData = async (roomId) => {
+  const usersList = await RoomController.getRoomUsers(roomId);
   if(usersList.length === 0 || !usersList) return [];
   
   const usersFilteredArray = usersList.map(el => mongoose.Types.ObjectId(el.id));

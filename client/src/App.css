@@ -302,3 +302,7 @@
 .about-links{
   display: block;
 }
+
+main > .makeStyles-root-1 {
+  margin-top: 0 !important;
+}

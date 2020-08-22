@@ -184,6 +184,47 @@ const exitRoom = async (token, room) => {
     
 }
 
+const multipleExit = async (room, users) => {
+    const loggedRoom = await Room.findById({_id:room});
+    if(!loggedRoom) return false;
+
+    const roomUsers = loggedRoom.users;
+    if(!roomUsers) return false;
+
+    try {
+        const usersInRoom = await roomUsers.find().where('_id').in(users).exec();
+
+    } catch (error) {
+        return {exitedUser: userID, currentRoomUsers: []};
+    }
+
+
+}
+
+const multipleJoin = async (room, users) => {
+    const guestRoom = await Room.findById({_id:room})
+
+    if (!guestRoom) return false;
+    
+    const roomUsers = guestRoom.users;
+    users.forEach((user, idx) => {
+        const userInRoomIndex = roomUsers.findIndex(x => x.id === user.id);
+        if (userInRoomIndex === -1) {
+            roomUsers.push({
+                id: user.id
+            });
+        }
+        
+    })
+    
+    guestRoom.users = roomUsers;
+    const joinCompleted = await guestRoom.save();
+
+    if (!joinCompleted) return false;
+
+    return roomUsers;
+}
+
 
 const removeUserFromRoom = async (userID, room) => {
     const loggedRoom = await Room.findById({_id:room})
@@ -218,6 +259,8 @@ module.exports = {
     removeRoom,
     verifyPassword,
     joinRoom,
+    multipleJoin,
     exitRoom,
+    multipleExit,
     removeUserFromRoom
 };

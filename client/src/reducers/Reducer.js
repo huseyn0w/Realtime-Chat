@@ -34,11 +34,16 @@ const Reducer = (state, action) => {
             };
         case actions.CREATE_ROOM:
             const oldRooms = [...state.rooms];
-            oldRooms.push(action.payload);
-            return {
-                ...state,
-                rooms: oldRooms,
-            };
+            const newRoomExist = oldRooms.findIndex(x => x._id === action.payload._id);
+            if(newRoomExist === - 1){
+                oldRooms.push(action.payload);
+                return {
+                    ...state,
+                    rooms: oldRooms,
+                };
+            }
+            return state;
+            
         case actions.UPDATE_ROOM:
             const updatedRooms = [...state.rooms];
             const updateArrayIndex = updatedRooms.findIndex(x => x._id === action.payload._id);

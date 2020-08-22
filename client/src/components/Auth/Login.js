@@ -12,6 +12,7 @@ import { makeStyles } from '@material-ui/core/styles';
 import MuiAlert from '@material-ui/lab/Alert';
 import axios from 'axios';
 import {email_validate_pattern} from '../../utils/helpers';
+import '../../App.css';
 
 
 function Alert(props) {
@@ -23,7 +24,7 @@ const useStyles = makeStyles((theme) => ({
     height: '100vh',
     width: '100%',
     '& > * + *': {
-      marginTop: theme.spacing(2),
+      marginTop: theme.spacing(0),
     },
   },
   image: {
@@ -105,8 +106,6 @@ export default function SignInSide() {
 
   const loginUser = async () => {
     try {
-      console.log(process.env);
-      console.log(process.env.REACT_APP_BACKEND_URL);
         const fetchResponse = await axios.post(`${process.env.REACT_APP_BACKEND_URL}/login`, {
             email,
             password
@@ -137,6 +136,8 @@ export default function SignInSide() {
     }    
 
 }
+
+
 
 let result = (
     <Grid container component="main" className={classes.root}>
