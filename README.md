@@ -1,6 +1,7 @@
 # Realtime-Chat
 
-This application is created for companies who want to have a conversation opportunity between team members without using any messenger or open-source social platform
+Did you like realtime chat, messengers? Are you using such platforms as Skype, Zoom, or Slack? Would you like to have a similar application written on Javascript / React js?
+Then this application is for you!
 
 ![Live preview Image](https://repository-images.githubusercontent.com/285118211/713e5300-d6c6-11ea-881b-0803707200bb)
 
